@@ -1,0 +1,81 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import PostList from '../components/PostList.astro';
+import { profile, awards } from '../data/profile';
+import { getProjects, getPosts } from '../lib/content';
+
+const projects = await getProjects();
+const featured = projects.filter((project) => project.data.featured);
+const posts = (await getPosts()).slice(0, 3);
+---
+
+<BaseLayout>
+  <section class="hero">
+    <p class="eyebrow">ON-DEVICE LLM · RAG · KOREAN NLP</p>
+    <h1>{profile.tagline}</h1>
+    <p class="lead">
+      안녕하세요, {profile.name}입니다. {profile.lead}
+    </p>
+    <div class="actions">
+      <a class="button primary" href="/projects/">프로젝트 {projects.length}개 보기</a>
+      <a class="button" href="/about/">소개</a>
+      <a class="button" href={profile.github} rel="me noopener">GitHub</a>
+    </div>
+    <ul class="facts">
+      <li><strong>{awards.filter((a) => a.title.includes('우수논문상')).length}회</strong> 학회 우수논문상</li>
+      <li><strong>KCI</strong> 논문 게재 (제1저자)</li>
+      <li><strong>SCPC 2026</strong> AI 챌린지 본선</li>
+    </ul>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <h2>대표 프로젝트</h2>
+      <a href="/projects/">전체 보기 →</a>
+    </div>
+    <div class="grid">
+      {featured.map((project) => <ProjectCard project={project} />)}
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <h2>최근 글</h2>
+      <a href="/blog/">전체 보기 →</a>
+    </div>
+    <PostList posts={posts} />
+  </section>
+</BaseLayout>
+
+<style>
+  .hero {
+    padding-top: clamp(3rem, 9vw, 6rem);
+  }
+  .hero h1 {
+    max-width: 16em;
+    font-size: clamp(2rem, 6vw, 3.1rem);
+  }
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-top: 1.75rem;
+  }
+  .facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 2rem;
+    list-style: none;
+    padding: 1.25rem 0 0;
+    margin: 2.5rem 0 0;
+    border-top: 1px solid var(--line);
+    color: var(--muted);
+    font-size: 0.95rem;
+  }
+  .facts strong {
+    color: var(--ink);
+    font-weight: 750;
+    margin-right: 0.15rem;
+  }
+</style>

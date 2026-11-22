@@ -1,0 +1,104 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import TagList from '../components/TagList.astro';
+import { profile, education, skills } from '../data/profile';
+---
+
+<BaseLayout title="소개" description={profile.lead}>
+  <header class="page-head">
+    <p class="eyebrow">{profile.nameEn}</p>
+    <h1>{profile.name}</h1>
+    <p class="lead">{profile.tagline}</p>
+  </header>
+
+  <div class="prose">
+    {profile.about.map((paragraph) => <p>{paragraph}</p>)}
+  </div>
+
+  <section class="section">
+    <h2>관심 분야</h2>
+    <ul class="plain">
+      {profile.interests.map((interest) => <li>{interest}</li>)}
+    </ul>
+  </section>
+
+  <section class="section">
+    <h2>기술</h2>
+    <dl class="skills">
+      {
+        skills.map((skill) => (
+          <div>
+            <dt>{skill.group}</dt>
+            <dd>
+              <TagList tags={skill.items} />
+            </dd>
+          </div>
+        ))
+      }
+    </dl>
+  </section>
+
+  <section class="section">
+    <h2>학력</h2>
+    {
+      education.map((item) => (
+        <p>
+          <strong>
+            {item.school} {item.major}
+          </strong>
+          <br />
+          <span class="muted">
+            {item.period} · {item.note}
+          </span>
+        </p>
+      ))
+    }
+  </section>
+
+  <section class="section">
+    <h2>연락</h2>
+    <p>
+      프로젝트에 대한 질문이나 제안은 GitHub로 연락해 주세요.
+    </p>
+    <p>
+      <a class="button" href={profile.github} rel="me noopener">GitHub @{profile.handle} ↗</a>
+      <a class="button" href="/cv/">이력서 보기</a>
+    </p>
+  </section>
+</BaseLayout>
+
+<style>
+  .plain {
+    padding-left: 1.3rem;
+    margin: 0;
+  }
+  .plain li {
+    margin-bottom: 0.35rem;
+  }
+  .skills {
+    display: grid;
+    gap: 1.1rem;
+    margin: 0;
+  }
+  .skills div {
+    display: grid;
+    grid-template-columns: 9rem 1fr;
+    gap: 0.5rem 1rem;
+    align-items: baseline;
+  }
+  .skills dt {
+    font-weight: 650;
+    font-size: 0.95rem;
+  }
+  .skills dd {
+    margin: 0;
+  }
+  .button + .button {
+    margin-left: 0.4rem;
+  }
+  @media (max-width: 34rem) {
+    .skills div {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

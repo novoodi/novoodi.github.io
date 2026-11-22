@@ -1,0 +1,69 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { formatDate } from '../lib/content';
+
+interface Props {
+  posts: CollectionEntry<'blog'>[];
+}
+
+const { posts } = Astro.props;
+---
+
+{
+  posts.length === 0 ? (
+    <p class="muted">아직 글이 없습니다.</p>
+  ) : (
+    <ul class="posts">
+      {posts.map((post) => (
+        <li>
+          <time datetime={post.data.date.toISOString()}>{formatDate(post.data.date)}</time>
+          <div>
+            <a href={`/blog/${post.id}/`}>{post.data.title}</a>
+            <p>{post.data.summary}</p>
+          </div>
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+<style>
+  .posts {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid var(--line);
+  }
+  li {
+    display: grid;
+    grid-template-columns: 7rem 1fr;
+    gap: 0.25rem 1rem;
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--line);
+  }
+  time {
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    color: var(--muted);
+    padding-top: 0.25rem;
+  }
+  a {
+    font-weight: 650;
+    font-size: 1.05rem;
+    color: var(--ink);
+    text-decoration: none;
+  }
+  a:hover {
+    color: var(--accent);
+  }
+  p {
+    margin: 0.2rem 0 0;
+    color: var(--muted);
+    font-size: 0.95rem;
+  }
+  @media (max-width: 34rem) {
+    li {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

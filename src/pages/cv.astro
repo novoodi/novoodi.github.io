@@ -1,0 +1,253 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { profile, education, skills, awards, activities, certificates } from '../data/profile';
+import { getProjects } from '../lib/content';
+
+const projects = await getProjects();
+---
+
+<BaseLayout title="이력서" description={`${profile.name}의 학력, 논문·수상, 활동, 프로젝트 요약`}>
+  <header class="page-head">
+    <p class="eyebrow">CURRICULUM VITAE</p>
+    <h1>{profile.name} <span class="en">{profile.nameEn}</span></h1>
+    <p class="lead">{profile.lead}</p>
+    <p class="contact">
+      <a href={profile.github} rel="me noopener">github.com/{profile.handle}</a>
+      <button class="button print" type="button">인쇄 · PDF로 저장</button>
+    </p>
+  </header>
+
+  <section class="block">
+    <h2>학력</h2>
+    <ul class="rows">
+      {
+        education.map((item) => (
+          <li>
+            <span class="when">{item.period}</span>
+            <div>
+              <strong>
+                {item.school} {item.major}
+              </strong>
+              <p>{item.note}</p>
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <section class="block">
+    <h2>논문 · 수상</h2>
+    <ul class="rows">
+      {
+        awards.map((item) => (
+          <li>
+            <span class="when">{item.date}</span>
+            <div>
+              <strong>{item.title}</strong>
+              <p>
+                {item.detail}
+                {item.project && (
+                  <>
+                    {' '}
+                    <a href={`/projects/${item.project}/`}>프로젝트 보기</a>
+                  </>
+                )}
+              </p>
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <section class="block">
+    <h2>대회 · 활동</h2>
+    <ul class="rows">
+      {
+        activities.map((item) => (
+          <li>
+            <span class="when">{item.date}</span>
+            <div>
+              <strong>{item.title}</strong>
+              <p>
+                {item.detail}
+                {item.project && (
+                  <>
+                    {' '}
+                    <a href={`/projects/${item.project}/`}>프로젝트 보기</a>
+                  </>
+                )}
+              </p>
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <section class="block">
+    <h2>프로젝트</h2>
+    <ul class="rows">
+      {
+        projects.map((project) => (
+          <li>
+            <span class="when">{project.data.period}</span>
+            <div>
+              <strong>
+                <a href={`/projects/${project.id}/`}>{project.data.title}</a>
+              </strong>
+              <p>
+                {project.data.summary}
+                <span class="role">
+                  {project.data.kind} · {project.data.role}
+                </span>
+              </p>
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <section class="block">
+    <h2>기술</h2>
+    <ul class="rows">
+      {
+        skills.map((skill) => (
+          <li>
+            <span class="when label">{skill.group}</span>
+            <div>
+              <p>{skill.items.join(', ')}</p>
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <section class="block">
+    <h2>자격</h2>
+    <ul class="rows">
+      {
+        certificates.map((item) => (
+          <li>
+            <span class="when label">{item.title}</span>
+            <div>
+              <p>{item.detail}</p>
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+</BaseLayout>
+
+<script>
+  document.querySelector('.print')?.addEventListener('click', () => window.print());
+</script>
+
+<style>
+  .en {
+    font-size: 0.5em;
+    font-weight: 500;
+    color: var(--muted);
+    letter-spacing: 0;
+    white-space: nowrap;
+  }
+  .contact {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1.25rem;
+    margin-top: 1.25rem;
+  }
+  .print {
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .block {
+    margin-top: 2.75rem;
+  }
+  .block h2 {
+    font-size: 1rem;
+    color: var(--accent);
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 0;
+  }
+  .rows {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .rows li {
+    display: grid;
+    grid-template-columns: 10.5rem 1fr;
+    gap: 0.25rem 1.25rem;
+    padding: 0.9rem 0;
+    border-bottom: 1px solid var(--line);
+    break-inside: avoid;
+  }
+  .when {
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    color: var(--muted);
+    padding-top: 0.2rem;
+  }
+  .when.label {
+    font-family: var(--font-sans);
+    font-size: 0.92rem;
+    font-weight: 650;
+    color: var(--ink);
+    padding-top: 0;
+  }
+  .rows p {
+    margin: 0.15rem 0 0;
+    color: var(--muted);
+    font-size: 0.95rem;
+    line-height: 1.65;
+  }
+  .rows div > p:first-child {
+    margin-top: 0;
+    color: var(--ink);
+  }
+  .rows strong a {
+    color: var(--ink);
+  }
+  .role {
+    display: block;
+    font-size: 0.87rem;
+    margin-top: 0.15rem;
+  }
+  @media (max-width: 36rem) {
+    .rows li {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* 인쇄하면 머리말·꼬리말·버튼을 빼고 한 장짜리 이력서처럼 나옵니다 */
+  @media print {
+    :global(.site-header),
+    :global(.site-footer),
+    :global(.skip),
+    .print {
+      display: none !important;
+    }
+    :global(body) {
+      font-size: 10.5pt;
+      background: #fff;
+      color: #000;
+    }
+    :global(main) {
+      padding-bottom: 0 !important;
+      min-height: 0 !important;
+    }
+    .block {
+      margin-top: 1.25rem;
+    }
+    .rows li {
+      padding: 0.45rem 0;
+    }
+  }
+</style>

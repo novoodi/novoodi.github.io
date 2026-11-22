@@ -1,0 +1,40 @@
+name: GitHub Pages 배포
+
+on:
+  # main 브랜치에 push하면 자동으로 배포합니다
+  push:
+    branches: [main]
+  # Actions 탭에서 수동으로도 실행할 수 있습니다
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# 배포가 겹치면 진행 중인 것은 끝까지 두고 대기 중인 것만 최신으로 바꿉니다
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 코드 받기
+        uses: actions/checkout@v7
+      - name: 설치, 빌드, 업로드
+        uses: withastro/action@v6
+        with:
+          node-version: 22
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: GitHub Pages에 배포
+        id: deployment
+        uses: actions/deploy-pages@v5

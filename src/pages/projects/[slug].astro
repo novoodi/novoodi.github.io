@@ -1,0 +1,251 @@
+---
+import { Image } from 'astro:assets';
+import { render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import TagList from '../../components/TagList.astro';
+import { getProjects } from '../../lib/content';
+
+export async function getStaticPaths() {
+  const projects = await getProjects();
+  return projects.map((project, index) => ({
+    params: { slug: project.id },
+    props: {
+      project,
+      prev: projects[index - 1],
+      next: projects[index + 1],
+    },
+  }));
+}
+
+const { project, prev, next } = Astro.props;
+const { title, summary, period, kind, role, stack, award, highlights, gallery, github, demo } =
+  project.data;
+const { Content } = await render(project);
+---
+
+<BaseLayout title={title} description={summary}>
+  <article>
+    <header class="page-head">
+      <p class="eyebrow"><a href="/projects/">프로젝트</a> / {period}</p>
+      <h1>{title}</h1>
+      <p class="lead">{summary}</p>
+
+      <dl class="info">
+        <div>
+          <dt>형태</dt>
+          <dd>{kind}</dd>
+        </div>
+        <div>
+          <dt>역할</dt>
+          <dd>{role}</dd>
+        </div>
+        {
+          award && (
+            <div>
+              <dt>성과</dt>
+              <dd>{award}</dd>
+            </div>
+          )
+        }
+        <div>
+          <dt>기술</dt>
+          <dd><TagList tags={stack} /></dd>
+        </div>
+      </dl>
+
+      {
+        (github || demo) && (
+          <div class="links">
+            {github && (
+              <a class="button" href={github} rel="noopener">
+                GitHub 저장소 ↗
+              </a>
+            )}
+            {demo && (
+              <a class="button primary" href={demo} rel="noopener">
+                바로 보기 ↗
+              </a>
+            )}
+          </div>
+        )
+      }
+    </header>
+
+    {
+      highlights.length > 0 && (
+        <ul class="highlights" aria-label="핵심 수치">
+          {highlights.map((item) => (
+            <li>
+              <strong>{item.value}</strong>
+              <span>{item.label}</span>
+            </li>
+          ))}
+        </ul>
+      )
+    }
+
+    {
+      gallery.length > 0 && (
+        <section class="gallery" aria-label="화면">
+          {gallery.map((shot) => (
+            <figure>
+              <Image src={shot.src} alt={shot.caption} widths={[320, 540]} sizes="(min-width: 44rem) 13rem, 60vw" />
+              <figcaption>{shot.caption}</figcaption>
+            </figure>
+          ))}
+        </section>
+      )
+    }
+
+    <div class="prose">
+      <Content />
+    </div>
+  </article>
+
+  <nav class="pager" aria-label="다른 프로젝트">
+    {
+      prev ? (
+        <a href={`/projects/${prev.id}/`}>
+          <span>← 이전</span>
+          <strong>{prev.data.title}</strong>
+        </a>
+      ) : (
+        <span />
+      )
+    }
+    {
+      next ? (
+        <a class="next" href={`/projects/${next.id}/`}>
+          <span>다음 →</span>
+          <strong>{next.data.title}</strong>
+        </a>
+      ) : (
+        <span />
+      )
+    }
+  </nav>
+</BaseLayout>
+
+<style>
+  .eyebrow a {
+    color: inherit;
+  }
+  .info {
+    display: grid;
+    gap: 0.6rem;
+    margin: 2rem 0 0;
+    padding: 1.1rem 1.25rem;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    max-width: 44rem;
+  }
+  .info div {
+    display: grid;
+    grid-template-columns: 3.5rem 1fr;
+    gap: 1rem;
+    align-items: baseline;
+  }
+  .info dt {
+    font-size: 0.85rem;
+    color: var(--muted);
+    font-weight: 600;
+  }
+  .info dd {
+    margin: 0;
+    font-size: 0.97rem;
+  }
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-top: 1.25rem;
+  }
+
+  .highlights {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1px;
+    list-style: none;
+    padding: 0;
+    margin: 0 0 2.5rem;
+    background: var(--line);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .highlights li {
+    /* 줄이 바뀌어 남는 칸은 마지막 항목이 채웁니다 */
+    flex: 1 1 9.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 1.1rem 1.25rem;
+    background: var(--surface);
+  }
+  .highlights strong {
+    font-size: 1.35rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.25;
+    color: var(--accent);
+    font-variant-numeric: tabular-nums;
+  }
+  .highlights span {
+    font-size: 0.85rem;
+    line-height: 1.45;
+    color: var(--muted);
+  }
+
+  /* 스크린샷: 좁은 화면에서는 옆으로 넘겨 봅니다 */
+  .gallery {
+    display: flex;
+    gap: 1rem;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    padding-bottom: 0.75rem;
+    margin-bottom: 2.5rem;
+  }
+  .gallery figure {
+    flex: 0 0 min(60vw, 13rem);
+    margin: 0;
+    scroll-snap-align: start;
+  }
+  .gallery :global(img) {
+    width: 100%;
+    border-radius: 12px;
+    border: 1px solid var(--line);
+  }
+  .gallery figcaption {
+    margin-top: 0.5rem;
+    font-size: 0.85rem;
+    line-height: 1.45;
+    color: var(--muted);
+  }
+
+  .pager {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-top: 4rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--line);
+  }
+  .pager a {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    text-decoration: none;
+    color: var(--ink);
+  }
+  .pager a:hover strong {
+    color: var(--accent);
+  }
+  .pager span {
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+  .pager .next {
+    text-align: right;
+  }
+</style>
