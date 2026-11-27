@@ -82,6 +82,14 @@ export const skills: { group: string; items: string[] }[] = [
 
 export const awards: { date: string; title: string; detail: string; project?: string }[] = [
   {
+    date: '2026.11',
+    title: 'SW Start-Up Festa 우수작품상 우수상',
+    detail:
+      '2026학년도 SW Start-Up Festa (과학기술정보통신부·IITP 지원, 신한대학교 SW중심대학사업단 주관). ' +
+      '「컨텍스트 기반 입력 정형화와 응답 검증 하네스의 피드백 순환을 통한 의사결정 어시스턴트」 (모이미)',
+    project: 'moimi',
+  },
+  {
     date: '2025.12',
     title: 'KCI 논문 게재 (제1저자)',
     detail:
